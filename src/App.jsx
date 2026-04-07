@@ -245,20 +245,20 @@ const CSS = `
   .chip{display:inline-block;background:var(--y);border:var(--bd);box-shadow:var(--sh);padding:5px 14px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:18px}
   .h1{font-family:'Syne',sans-serif;font-weight:900;font-size:clamp(2.6rem,9vw,4.8rem);line-height:1.03;letter-spacing:-.03em;margin-bottom:14px}
   .h1 em{color:var(--b);font-style:normal}
-  .sub{font-size:15px;color:#555;line-height:1.75;margin-bottom:28px}
-  .lvs{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:28px}
-  .lv{flex:1;min-width:140px;max-width:180px;border:var(--bd);box-shadow:var(--sh);padding:16px 12px;cursor:pointer;text-align:center;background:var(--w);transition:transform .1s,box-shadow .1s,background .15s}
+  .sub{font-size:15px;color:#555;line-height:1.75;margin-bottom:28px;font-family:'Syne',sans-serif;font-weight:400}
+  .lvs{display:flex;gap:10px;justify-content:center;flex-wrap:nowrap;margin-bottom:28px;width:100%}
+  .lv{flex:1;min-width:0;border:var(--bd);box-shadow:var(--sh);padding:14px 8px;cursor:pointer;text-align:center;background:var(--w);transition:transform .1s,box-shadow .1s,background .15s}
   .lv:hover{transform:translate(-2px,-2px);box-shadow:var(--shl)}
   .lv.on{background:var(--b);color:var(--w)}
-  .lv-e{font-size:28px;margin-bottom:5px}
-  .lv-t{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;margin-bottom:3px}
-  .lv-d{font-size:11px;opacity:.7}
-  .btn{display:inline-flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-weight:800;font-size:17px;letter-spacing:.04em;padding:18px 40px;border:var(--bd);box-shadow:var(--shl);cursor:pointer;transition:transform .1s,box-shadow .1s;text-transform:uppercase;background:var(--b);color:var(--w)}
+  .lv-e{font-size:24px;margin-bottom:4px}
+  .lv-t{font-family:'Syne',sans-serif;font-weight:800;font-size:13px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lv-d{font-size:10px;opacity:.7;line-height:1.4}
+  .btn{display:flex;width:100%;align-items:center;justify-content:center;gap:8px;font-family:'Syne',sans-serif;font-weight:800;font-size:17px;letter-spacing:.04em;padding:18px 20px;border:var(--bd);box-shadow:var(--shl);cursor:pointer;transition:transform .1s,box-shadow .1s;text-transform:uppercase;background:var(--b);color:var(--w)}
   .btn:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--k)}
   .btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--k)}
-  .btn.out{background:var(--w);color:var(--k)}
-  .sstats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
-  .sstat{border:var(--bd);padding:7px 14px;font-size:12px;box-shadow:var(--sh)}
+  .btn.out{background:var(--w);color:var(--k);width:auto}
+  .sstats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+  .sstat{border:var(--bd);padding:7px 12px;font-size:12px;box-shadow:var(--sh);font-family:'Syne',sans-serif;white-space:nowrap}
   .sstat strong{color:var(--b)}
   /* countdown */
   .cd{text-align:center}
@@ -320,6 +320,8 @@ const CSS = `
   .sb{padding:12px 18px;border:var(--bd);box-shadow:var(--sh);font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;text-transform:uppercase;letter-spacing:.04em;transition:transform .1s,box-shadow .1s}
   .sb:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--k)}
   .sb.li{background:#0077b5;color:#fff}
+  .sb.wa{background:#25d366;color:#fff}
+  .sb.tt{background:#000;color:#fff}
   .sb.cp{background:var(--y);color:var(--k)}
   .lbadge{display:inline-block;border:var(--bd);padding:4px 12px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;box-shadow:var(--sh)}
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--k);color:var(--w);padding:12px 24px;font-size:13px;border:2px solid var(--g);box-shadow:var(--sh);z-index:99;animation:fdup .3s ease}
@@ -335,7 +337,24 @@ const injectCSS = () => {
   document.head.appendChild(el);
 };
 
-// ─── QUESTION COMPONENTS ──────────────────────────────────────────────────────
+// ─── LIVE TELLER ─────────────────────────────────────────────────────────────
+// Teller wordt opgeslagen in localStorage en loopt op bij elke test
+const START_COUNT = 12847; // startgetal — pas dit aan naar eigen inzicht
+function getCount() {
+  try { return parseInt(localStorage.getItem("snap_count") || START_COUNT); } catch { return START_COUNT; }
+}
+function bumpCount() {
+  try {
+    const n = getCount() + 1;
+    localStorage.setItem("snap_count", n);
+    return n;
+  } catch { return START_COUNT; }
+}
+function fmtCount(n) {
+  return n.toLocaleString("nl-NL"); // bijv. 12.847
+}
+
+
 
 // BUG FIX: ReactionQ — stable, no key re-mount issues
 function ReactionQ({ data, onAnswer }) {
@@ -513,6 +532,7 @@ function QuestionWrapper({ q, idx, onAnswer }) {
 // ─── SCREENS ──────────────────────────────────────────────────────────────────
 function Landing({ onStart }) {
   const [lv, setLv] = useState("medium");
+  const [count, setCount] = useState(getCount);
   return (
     <div className="land">
       <div className="chip">⚡ Gratis cognitieve snelheidstest</div>
@@ -529,7 +549,7 @@ function Landing({ onStart }) {
       </div>
       <button className="btn" onClick={() => onStart(lv)}>⚡ Start de test</button>
       <div className="sstats">
-        <div className="sstat"><strong>12.847</strong> testen gedaan</div>
+        <div className="sstat"><strong>{fmtCount(count)}</strong> testen gedaan</div>
         <div className="sstat">Gemiddeld: <strong>Stadsfiets</strong></div>
         <div className="sstat">50+ unieke vragen</div>
       </div>
@@ -571,6 +591,7 @@ function Quiz({ level, onDone }) {
     resultsRef.current = [...resultsRef.current, { correct: ok, ms }];
     const next = idx + 1;
     if (next >= qs.length) {
+      bumpCount();
       onDone(resultsRef.current);
     } else {
       setIdx(next);
@@ -609,9 +630,35 @@ function Calculating({ onDone }) {
   );
 }
 
-function EmailGate({ onSubmit, onSkip }) {
+// ⚠️  VERVANG "YOUR_FORM_ID" met jouw eigen Formspree form ID
+//     Ga naar formspree.io → New Form → kopieer het ID uit de action URL
+const FORMSPREE_ID = "xdapby1g";
+
+function EmailGate({ onSubmit, onSkip, score, cat, level }) {
   const [em, setEm] = useState("");
-  const go = () => { if (em.includes("@")) onSubmit(em); };
+  const [status, setStatus] = useState("idle"); // idle | sending | done | error
+  const ld = LEVELS.find(l => l.id === level);
+
+  const go = async () => {
+    if (!em.includes("@")) return;
+    setStatus("sending");
+    try {
+      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          email: em,
+          score: score,
+          categorie: cat.label,
+          level: ld.label,
+          _subject: `Nieuwe snapsnelheid deelnemer — ${cat.emoji} ${cat.label} (${score}/99)`,
+        }),
+      });
+      if (res.ok) { setStatus("done"); setTimeout(() => onSubmit(em), 800); }
+      else { setStatus("error"); }
+    } catch { setStatus("error"); }
+  };
+
   return (
     <div className="gate">
       <div style={{ fontFamily: "'Syne',sans-serif", fontWeight: 900, fontSize: "clamp(1.6rem,5vw,2.1rem)", marginBottom: "10px" }}>
@@ -620,10 +667,31 @@ function EmailGate({ onSubmit, onSkip }) {
       <p style={{ fontSize: "14px", color: "#555", lineHeight: 1.75, marginBottom: "24px" }}>
         Vul je e-mail in om je score te vergelijken met Nederland — en ontvang tips om je snapsnelheid te verhogen.
       </p>
-      <div className="er">
-        <input className="ei" placeholder="jouw@email.nl" value={em} onChange={e => setEm(e.target.value)} onKeyDown={e => e.key === "Enter" && go()} type="email" />
-        <button className="eb" onClick={go}>Bekijk →</button>
-      </div>
+      {status === "done" ? (
+        <div style={{ fontSize: "16px", color: "#00aa55", fontWeight: 700, marginBottom: "16px" }}>✅ Gelukt! Je score wordt geladen...</div>
+      ) : (
+        <>
+          <div className="er">
+            <input
+              className="ei"
+              placeholder="jouw@email.nl"
+              value={em}
+              onChange={e => setEm(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && go()}
+              type="email"
+              disabled={status === "sending"}
+            />
+            <button className="eb" onClick={go} disabled={status === "sending"}>
+              {status === "sending" ? "..." : "Bekijk →"}
+            </button>
+          </div>
+          {status === "error" && (
+            <div style={{ fontSize: "12px", color: "#ff2244", marginBottom: "8px" }}>
+              Er ging iets mis. Probeer opnieuw of sla over.
+            </div>
+          )}
+        </>
+      )}
       <button className="sk" onClick={onSkip}>Overslaan, laat me mijn score zien</button>
     </div>
   );
@@ -638,9 +706,45 @@ function Result({ results, level, onRetry }) {
   const [copied, setCopied] = useState(false);
   const ld = LEVELS.find(l => l.id === level);
 
-  const shareText = `Mijn snapsnelheid score: ${score}/99 — Ik ben een ${cat.emoji} ${cat.label}! (${ld.label} level)\nDoe de test op snapsnelheid.nl`;
-  const copy = () => { navigator.clipboard.writeText(shareText); setCopied(true); setTimeout(() => setCopied(false), 2500); };
-  const li = () => window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent("https://snapsnelheid.nl")}&summary=${encodeURIComponent(shareText)}`, "_blank");
+  const siteUrl = "https://www.snapsnelheid.nl";
+  const shareText = `Ik deed de Snapsnelheid test en ben een ${cat.emoji} ${cat.label}! (score: ${score}/99 — ${ld.label} level)\n\nBen jij sneller? Doe de gratis test op 👇\n${siteUrl}`;
+
+  const shareLinkedIn = () => {
+    const url = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(shareText)}`;
+    window.open(url, "_blank", "width=600,height=600");
+  };
+
+  const shareWhatsApp = () => {
+    const url = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+    window.open(url, "_blank");
+  };
+
+  const shareTikTok = () => {
+    // TikTok heeft geen directe share URL — kopieer tekst + open TikTok
+    navigator.clipboard.writeText(shareText).then(() => {
+      setCopied("tiktok");
+      setTimeout(() => setCopied(false), 3000);
+      setTimeout(() => window.open("https://www.tiktok.com", "_blank"), 400);
+    });
+  };
+
+  const badgeText =
+    `╔══════════════════════════╗\n` +
+    `║  ⚡ SNAPSNELHEID.NL      ║\n` +
+    `║                          ║\n` +
+    `║  ${cat.emoji}  ${cat.label.padEnd(20)}║\n` +
+    `║  Score: ${String(score).padEnd(18)}/99 ║\n` +
+    `║  Level: ${ld.label.padEnd(17)}║\n` +
+    `║                          ║\n` +
+    `║  snapsnelheid.nl         ║\n` +
+    `╚══════════════════════════╝`;
+
+  const copyBadge = () => {
+    navigator.clipboard.writeText(badgeText).then(() => {
+      setCopied("badge");
+      setTimeout(() => setCopied(false), 2500);
+    });
+  };
 
   return (
     <div className="res">
@@ -659,12 +763,21 @@ function Result({ results, level, onRetry }) {
           <div className="ms"><strong>Top {Math.max(1, 100 - score)}%</strong>Nederland</div>
         </div>
       </div>
-      <div className="sr">
-        <button className="sb li" onClick={li}>in Deel op LinkedIn</button>
-        <button className="sb cp" onClick={copy}>📋 Kopieer badge</button>
+
+      <div style={{ fontSize: "12px", color: "#888", marginBottom: "10px", textTransform: "uppercase", letterSpacing: ".1em" }}>
+        Deel jouw score
       </div>
-      <button className="btn out" onClick={onRetry} style={{ fontSize: "14px", padding: "12px 28px" }}>🔄 Opnieuw proberen</button>
-      {copied && <div className="toast">✅ Gekopieerd naar klembord!</div>}
+      <div className="sr">
+        <button className="sb li"  onClick={shareLinkedIn}>in LinkedIn</button>
+        <button className="sb wa"  onClick={shareWhatsApp}>💬 WhatsApp</button>
+        <button className="sb tt"  onClick={shareTikTok}>🎵 TikTok</button>
+        <button className="sb cp"  onClick={copyBadge}>📋 Kopieer</button>
+      </div>
+
+      <button className="btn out" onClick={onRetry} style={{ fontSize: "14px", padding: "12px 28px", marginTop: "6px" }}>🔄 Opnieuw proberen</button>
+
+      {copied === "badge"  && <div className="toast">✅ Badge gekopieerd! Plak hem waar je wilt.</div>}
+      {copied === "tiktok" && <div className="toast">✅ Tekst gekopieerd! TikTok opent — plak in je bio of video.</div>}
     </div>
   );
 }
@@ -685,8 +798,9 @@ export default function App() {
       {screen === "countdown"   && <Countdown onDone={() => setScreen("quiz")} />}
       {screen === "quiz"        && <Quiz level={level} onDone={r => { setResults(r); setScreen("calculating"); }} />}
       {screen === "calculating" && <Calculating onDone={() => setScreen("email")} />}
-      {screen === "email"       && <EmailGate onSubmit={() => setScreen("result")} onSkip={() => setScreen("result")} />}
+      {screen === "email"       && <EmailGate onSubmit={() => setScreen("result")} onSkip={() => setScreen("result")} score={calcScore(results)} cat={getCategory(calcScore(results))} level={level} />}
       {screen === "result"      && <Result results={results} level={level} onRetry={reset} />}
     </div>
   );
 }
+
